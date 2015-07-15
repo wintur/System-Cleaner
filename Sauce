@@ -8,7 +8,7 @@ TITLE System Cleaner
 
 :: Log file setup
 
-set LogPath=C:\System Cleaner Logs\
+set LogPath=C:\Logs\
 set LogFileExt=.log
 set LogFileName=Cleaner%LogFileExt%
 set MyLogFile=%date%
@@ -58,7 +58,7 @@ FOR /f "delims=: tokens=1*" %%A in ('systeminfo') DO (
 :main
 
 cls
-echo Cleaner by #AP - Version %VERSION%    %~f0
+echo Cleaner by WintuR - Version %VERSION%    %~f0
 echo Executed: %DATE% @ %TIME%
 echo. 
 echo Model:                  %MODEL%%SMFGR%
