@@ -1,1 +1,162 @@
-the sauce
+:: A simple utility; be sure to run as administrator
+
+@ECHO OFF
+color 3f
+setlocal
+SET VERSION=1.3.0.1
+TITLE Cleaner
+
+:: Log file setup
+
+set LogPath=C:\Logs\
+set LogFileExt=.log
+set LogFileName=Cleaner%LogFileExt%
+set MyLogFile=%date%
+set MyLogFile=%MyLogFile:/=-%
+set MyLogFile=%LogPath%%MyLogFile%_%LogFileName%
+
+
+
+:: Check for elevated permissions.
+    net session >nul 2>&1
+    if %errorLevel% == 0 (
+        goto initial
+    ) else (
+        echo Please execute this program from the Desktop with administrative permissions!
+	ping 127.0.0.1 -n 5 > nul
+	goto end
+    )
+)
+
+:initial
+
+If NOT Exist "%MyLogFile%" goto:noseparator
+
+:noseparator
+echo.%Date% >>"%MyLogFile%"
+echo.%Time% >>"%MyLogFile%"
+
+cls
+
+FOR /f %%a in ('WMIC OS GET LocalDateTime ^| find "."') DO set DTS=%%a
+SET DATE=%DTS:~0,4%-%DTS:~4,2%-%DTS:~6,2%
+
+FOR /f "delims=: tokens=1*" %%A in ('systeminfo') DO (
+  FOR /f "tokens=*" %%S in ("%%B") DO (
+    IF "%%A"=="OS Name" SET "OSNAME=%%S"
+    IF "%%A"=="OS Version" SET "OSVER=%%S"
+    IF "%%A"=="OS Configuration" SET "OSCONFIG=%%S"
+    IF "%%A"=="Original Install Date" SET "INSTDATE=%%S"
+    IF "%%A"=="System Model" SET "MODEL=%%S"
+    IF "%%A"=="System Manufacturer" SET "SMFGR=%%S"
+    IF "%%A"=="Registered Owner" SET "REGOWN=%%S"
+    IF "%%A"=="Original Install Date" SET "OID=%%S"
+    IF "%%A"=="System Boot Time" SET "SBT=%%S"
+    IF "%%A"=="Windows Directory" SET "LWWD=%%S"
+    IF "%%A"=="System Directory" SET "LSSD=%%S"
+  )
+)
+
+:main
+
+cls
+echo Cleaner by #AP - Version %VERSION%    %~f0
+echo Executed: %DATE% @ %TIME%
+echo. 
+echo Model:                  %MODEL%%SMFGR%
+echo.
+echo OS Name:                %OSNAME%
+echo OS Version:             %OSVER%
+echo OS Install Date:        %OID%
+echo OS Configuration:       %OSCONFIG%
+echo.
+echo User:                   %REGOWN%
+echo System Boot Time:       %SBT%
+echo.
+echo Windows Directory:      %LWWD%
+echo System Directory:       %LSSD%
+echo ********************************************************************************
+echo 1 - Temp Files
+echo 2 - Google Chrome
+echo 3 - Exit
+echo.
+set /p MENU=Select: 
+if "%MENU%"=="1" goto temp
+if "%MENU%"=="2" goto chrome
+if "%MENU%"=="3" goto end
+
+goto error
+
+:temp
+cls
+echo AppData (4 folders), Temp (2 folders), Flash Cookies (1 folder) will be cleaned.The Recycle Bin will then be emptied.
+echo.
+Choice /M "Proceed"
+If Errorlevel 2 Goto tempno
+If Errorlevel 1 Goto tempyes
+goto end
+
+:tempno
+goto main
+
+:tempyes
+echo.
+echo ********************************************************************************
+IF EXIST "%SystemDrive%\Users\" (
+    for /D %%x in ("%SystemDrive%\Users\*") do ( 
+        del /F /Q "%%x\AppData\Local\Temp\*">>"%MyLogFile%"
+        del /F /Q "%%x\AppData\Roaming\Microsoft\Windows\Recent\*">>"%MyLogFile%"
+        del /F /Q "%%x\AppData\Local\Microsoft\Windows\Temporary Internet Files\*">>"%MyLogFile%"
+        del /F /Q "%%x\AppData\Local\ApplicationHistory\*">>"%MyLogFile%"
+    )
+)
+
+del /F /S /Q "%TEMP%">>"%MyLogFile%"
+del /F /S /Q "%WINDIR%\TEMP\*">>"%MyLogFile%"
+
+rmdir /S /Q "%appdata%\Macromedia\Flash Player\#SharedObjects\#SharedObjects">>"%MyLogFile%"
+
+rmdir /s /q %SystemDrive%\RECYCLER 2>NUL
+rmdir /s /q %SystemDrive%\$Recycle.Bin 2>NUL
+
+echo.
+cls
+pause
+goto main
+
+:chrome
+cls
+echo Cache, History, Cookies, and Login Data will be cleaned
+echo.
+Choice /M "Proceed"
+If Errorlevel 2 Goto chromeno
+If Errorlevel 1 Goto chromeyes
+goto end
+
+:chromeno
+goto main
+
+:chromeyes
+echo.
+echo ********************************************************************************
+taskkill /F /IM "chrome.exe">nul 2>&1 >>"%MyLogFile%"
+set ChromeDataDir=C:\Users\%USERNAME%\AppData\Local\Google\Chrome\User Data\Default
+set ChromeCache=%ChromeDataDir%\Cache>nul 2>&1
+del /q /s /f "%ChromeCache%\*.*">>"%MyLogFile%"
+del /q /s /f "%ChromeDataDir%\GPUCache\*.*">>"%MyLogFile%"
+del /q /s /f "%ChromeDataDir%\Media Cache\*.*">>"%MyLogFile%"
+
+del /q /f "%ChromeDataDir%\*Cookies*.*">>"%MyLogFile%"
+del /q /f "%ChromeDataDir%\*History*.*">>"%MyLogFile%"
+del /q /f "%ChromeDataDir%\*Login Data*.*">>"%MyLogFile%"
+del /q /f "%ChromeDataDir%\*Web Data*.*">>"%MyLogFile%"
+del /q /f "%ChromeDataDir%\*Top Sites*.*">>"%MyLogFile%" 
+echo.
+cls
+Pause
+goto main
+
+:error
+goto main
+
+:end
