@@ -17,14 +17,14 @@
 	SET MyLogFile=%LogPath%%MyLogFile%_%LogFileName%
 
 :: Check for elevated permissions.
-    net session >nul 2>&1
-    if %errorLevel% == 0 (
-        goto initial
-    ) else (
-        echo Please execute this program from the Desktop with administrative permissions!
+	net session >nul 2>&1
+	if %errorLevel% == 0 (
+		goto initial
+) else (
+	echo Please execute this program from the Desktop with administrative permissions!
 	ping 127.0.0.1 -n 5 > nul
 	goto end
-    )
+	)
 )
 
 :initial
@@ -41,19 +41,19 @@ FOR /f %%a in ('WMIC OS GET LocalDateTime ^| find "."') DO set DTS=%%a
 SET DATE=%DTS:~0,4%-%DTS:~4,2%-%DTS:~6,2%
 
 FOR /f "delims=: tokens=1*" %%A in ('systeminfo') DO (
-  FOR /f "tokens=*" %%S in ("%%B") DO (
-    IF "%%A"=="OS Name" SET "OSNAME=%%S"
-    IF "%%A"=="OS Version" SET "OSVER=%%S"
-    IF "%%A"=="OS Configuration" SET "OSCONFIG=%%S"
-    IF "%%A"=="Original Install Date" SET "INSTDATE=%%S"
-    IF "%%A"=="System Model" SET "MODEL=%%S"
-    IF "%%A"=="System Manufacturer" SET "SMFGR=%%S"
-    IF "%%A"=="Registered Owner" SET "REGOWN=%%S"
-    IF "%%A"=="Original Install Date" SET "OID=%%S"
-    IF "%%A"=="System Boot Time" SET "SBT=%%S"
-    IF "%%A"=="Windows Directory" SET "LWWD=%%S"
-    IF "%%A"=="System Directory" SET "LSSD=%%S"
-  )
+	FOR /f "tokens=*" %%S in ("%%B") DO (
+    	IF "%%A"=="OS Name" SET "OSNAME=%%S"
+    	IF "%%A"=="OS Version" SET "OSVER=%%S"
+    	IF "%%A"=="OS Configuration" SET "OSCONFIG=%%S"
+    	IF "%%A"=="Original Install Date" SET "INSTDATE=%%S"
+    	IF "%%A"=="System Model" SET "MODEL=%%S"
+    	IF "%%A"=="System Manufacturer" SET "SMFGR=%%S"
+    	IF "%%A"=="Registered Owner" SET "REGOWN=%%S"
+    	IF "%%A"=="Original Install Date" SET "OID=%%S"
+    	IF "%%A"=="System Boot Time" SET "SBT=%%S"
+    	IF "%%A"=="Windows Directory" SET "LWWD=%%S"
+	IF "%%A"=="System Directory" SET "LSSD=%%S"
+	)
 )
 
 :main
@@ -159,3 +159,4 @@ goto main
 goto main
 
 :end
+Exit
