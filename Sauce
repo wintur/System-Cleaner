@@ -4,18 +4,16 @@
 color 3f
 setlocal
 SET VERSION=1.3.0.1
-TITLE Cleaner
+TITLE System Cleaner
 
 :: Log file setup
 
-set LogPath=C:\Logs\
+set LogPath=C:\System Cleaner Logs\
 set LogFileExt=.log
 set LogFileName=Cleaner%LogFileExt%
 set MyLogFile=%date%
 set MyLogFile=%MyLogFile:/=-%
 set MyLogFile=%LogPath%%MyLogFile%_%LogFileName%
-
-
 
 :: Check for elevated permissions.
     net session >nul 2>&1
